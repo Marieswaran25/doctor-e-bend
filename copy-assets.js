@@ -4,11 +4,14 @@ const path = require('path');
 const folders = ['templates'];
 
 folders.forEach(folder => {
-    const source = path.join(__dirname, folder);
-    const destination = path.join(__dirname, '..', 'dist', folder);
+    const source = path.join(__dirname, 'src', folder);
+    const destination = path.join(__dirname, 'dist', folder);
 
-    // Recursively copy function
     function copyDir(src, dest) {
+        if (!fs.existsSync(src)) {
+            console.warn(`Source folder "${src}" does not exist, skipping.`);
+            return;
+        }
         if (!fs.existsSync(dest)) {
             fs.mkdirSync(dest, { recursive: true });
         }
