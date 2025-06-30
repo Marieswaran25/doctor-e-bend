@@ -1,37 +1,27 @@
 import fs from 'fs/promises';
 import handlebars from 'handlebars';
 import path from 'path';
-import puppeteer, { PaperFormat } from 'puppeteer';
+import htmlPdf from 'html-pdf'; // use require('html-pdf') if this fails
 
 export type PdfOptions = {
+    format?: 'A4';
     printBackground?: boolean;
-    format?: PaperFormat;
 };
 
 export type HTMLTemplates = 'pdfReport';
+
 export class PdfService {
     public async htmlToPdf(
         html: string,
-        pdfOptions: PdfOptions = {
-            format: 'A4',
-            printBackground: true,
-        },
-    ) {
-        const browser = await puppeteer.launch({ headless: 'new' });
-        const page = await browser.newPage();
-
-        await page.setContent(html);
-
-        const pdfBuffer = await page.pdf({
-            ...pdfOptions,
-            margin: {
-                top: '16px',
-                bottom: '16px',
-            },
+        pdfOptions: PdfOptions = { format: 'A4' }
+    ): Promise<Buffer> {
+        return new Promise<Buffer>((resolve, reject) => {
+            htmlPdf.create(html, { format: pdfOptions.format || 'A4', })
+                .toBuffer((err, buffer) => {
+                    if (err) return reject(err);
+                    resolve(buffer);
+                });
         });
-
-        await browser.close();
-        return pdfBuffer;
     }
 
     public async compileHtmlHandlebars(htmlTemplate: HTMLTemplates, data: Record<string, any>): Promise<string> {
@@ -45,11 +35,8 @@ export class PdfService {
     public async generatePdfFromStoredHtml(
         htmlTemplate: HTMLTemplates,
         data: Record<string, any>,
-        pdfOptions: PdfOptions = {
-            format: 'A4',
-            printBackground: true,
-        },
-    ) {
+        pdfOptions: PdfOptions = { format: 'A4', printBackground: true }
+    ): Promise<Buffer> {
         const html = await this.compileHtmlHandlebars(htmlTemplate, data);
         return this.htmlToPdf(html, pdfOptions);
     }
