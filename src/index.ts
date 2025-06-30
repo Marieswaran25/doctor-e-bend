@@ -73,6 +73,7 @@ const initializeApp = async () => {
             startServer();
         }
     } catch (error: any) {
+        console.error(error);
         logger.error(`[Initialization Error]: Failed to initialize - ${JSON.stringify(error)}`);
     }
 };

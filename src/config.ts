@@ -36,3 +36,5 @@ export const CONFIG = Object.freeze({
 });
 
 export const VERSION1 = '/api/v1';
+
+export const DATABASE_URL = process.env.DATABASE_URL;

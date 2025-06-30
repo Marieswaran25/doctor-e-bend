@@ -7,7 +7,6 @@ import { RouteOptions } from '../types/routeoptions';
 export default (route: Router) => {
     const userController = UserController.initialize();
     const createNewUser = userController.createNewUser.bind(userController);
-    const getAllUsers = userController.getAllUsers.bind(userController);
 
     const userRouter: RouteOptions[] = [
         {
@@ -15,13 +14,6 @@ export default (route: Router) => {
             path: '/users',
             action: createNewUser,
             description: 'Create a new user',
-            roles: [],
-        },
-        {
-            method: 'get',
-            path: '/users',
-            action: getAllUsers,
-            description: 'Get all users',
             roles: [],
         },
     ];
