@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { body } from 'express-validator';
+import moment from 'moment';
 
 import { validateRequest } from '../helpers/validateRequest';
 import { PdfService } from '../services/pdfService';
@@ -27,16 +28,21 @@ export class PdfController extends BaseController {
                 body('selectedTooth').isString().withMessage('Invalid selected tooth').optional(),
                 body('image').isString().withMessage('Invalid image').optional(),
                 body('reportType').isString().withMessage('Invalid report type').optional(),
+                body('name').isString().withMessage('Invalid name').optional(),
+                body('age').isNumeric().withMessage('Invalid age').optional(),
             ]);
 
-            const { diagnosis, selectedTooth = 'No Selection', image, reportType } = req.body;
+            const { diagnosis, selectedTooth = 'No Selection', image, reportType, name, age } = req.body;
             this.logger.info(`Generating pdf report`);
             const pdfBuffer = await this.pdfService.generatePdfFromStoredHtml('pdfReport', {
-                name: 'Maries waran',
                 diagnosis: diagnosis,
                 selectedTooth,
                 image,
                 reportType,
+                name,
+                age,
+                patientId: `PID-${new Date().getTime()}`,
+                date: moment().format('DD-MM-YYYY HH:mm:ss').toString(),
             });
             this.logger.info(`Generated pdf report`);
 

@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import handlebars from 'handlebars';
+import htmlPdf from 'html-pdf';
 import path from 'path';
-import htmlPdf from 'html-pdf'; // use require('html-pdf') if this fails
 
 export type PdfOptions = {
     format?: 'A4';
@@ -11,16 +11,12 @@ export type PdfOptions = {
 export type HTMLTemplates = 'pdfReport';
 
 export class PdfService {
-    public async htmlToPdf(
-        html: string,
-        pdfOptions: PdfOptions = { format: 'A4' }
-    ): Promise<Buffer> {
+    public async htmlToPdf(html: string, pdfOptions: PdfOptions = { format: 'A4' }): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
-            htmlPdf.create(html, { format: pdfOptions.format || 'A4', })
-                .toBuffer((err, buffer) => {
-                    if (err) return reject(err);
-                    resolve(buffer);
-                });
+            htmlPdf.create(html, { format: pdfOptions.format || 'A4', zoomFactor: '1.5' }).toBuffer((err, buffer) => {
+                if (err) return reject(err);
+                resolve(buffer);
+            });
         });
     }
 
@@ -32,11 +28,7 @@ export class PdfService {
         return template(data);
     }
 
-    public async generatePdfFromStoredHtml(
-        htmlTemplate: HTMLTemplates,
-        data: Record<string, any>,
-        pdfOptions: PdfOptions = { format: 'A4', printBackground: true }
-    ): Promise<Buffer> {
+    public async generatePdfFromStoredHtml(htmlTemplate: HTMLTemplates, data: Record<string, any>, pdfOptions: PdfOptions = { format: 'A4', printBackground: true }): Promise<Buffer> {
         const html = await this.compileHtmlHandlebars(htmlTemplate, data);
         return this.htmlToPdf(html, pdfOptions);
     }
