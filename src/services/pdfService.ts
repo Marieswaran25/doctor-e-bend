@@ -13,7 +13,7 @@ export type HTMLTemplates = 'pdfReport';
 export class PdfService {
     public async htmlToPdf(html: string, pdfOptions: PdfOptions = { format: 'A4' }): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
-            htmlPdf.create(html, { format: pdfOptions.format || 'A4', zoomFactor: '1.5' }).toBuffer((err, buffer) => {
+            htmlPdf.create(html, { format: pdfOptions.format || 'A4' }).toBuffer((err, buffer) => {
                 if (err) return reject(err);
                 resolve(buffer);
             });
