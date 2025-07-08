@@ -5,6 +5,7 @@ import express, { Express, NextFunction, Request, Response, Router } from 'expre
 import { Options as RateLimitOptions, rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import http from 'http';
+import swaggerUi from 'swagger-ui-express';
 
 import { CustomError } from '../helpers/customErrors';
 import { Logger } from '../helpers/logger';
@@ -31,6 +32,10 @@ type RouteConfig = {
     route: Router;
 };
 
+type OpenAPI = {
+    path: `/${string}`;
+    specs: object;
+};
 export type ServerConfig = {
     APPLICATION_NAME: string;
     logger: Logger;
@@ -39,6 +44,7 @@ export type ServerConfig = {
     terminusOptions?: TerminusOptions;
     middlewares: MiddlewareConfig;
     routeConfig: RouteConfig[];
+    openAPI?: OpenAPI;
 };
 
 interface IServer {
@@ -59,6 +65,9 @@ export class Server implements IServer {
         this.server = http.createServer(this.app);
 
         this.logger = serverConfig.logger;
+
+        // Initialize OpenAPI
+        this.initializeOpenApi(serverConfig.openAPI);
 
         // Initialize Middlewares
         this.configureMiddlewares(serverConfig.middlewares);
@@ -131,6 +140,12 @@ export class Server implements IServer {
             routeConfig.forEach(route => {
                 this.app.use(route.prefix, route.route);
             });
+        }
+    }
+    // OpenAPI
+    private initializeOpenApi(config?: OpenAPI) {
+        if (config) {
+            this.app.use(config.path, swaggerUi.serve, swaggerUi.setup(config.specs));
         }
     }
 

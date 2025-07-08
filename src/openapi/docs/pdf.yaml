@@ -1,0 +1,44 @@
+tags:
+  - name: Pdf
+paths:
+  /pdf/diagnosis-report:
+    post:
+      tags:
+        - Pdf
+      summary: Generate Diagnosis Report
+      operationId: generateReportPdf
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                age:
+                  type: number
+                diagnosis:
+                  type: string
+                selectedTooth:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                reportType:
+                  type: string     
+      responses:
+        '200':
+          description: Pdf Buffer generated
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

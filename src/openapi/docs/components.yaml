@@ -1,0 +1,55 @@
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: number
+        error_message:
+          type: string
+    UpdateResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        affectedRows:
+          type: number
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        mobileNumber:
+          type: string
+        profileUrl:
+          type: string
+        emailVerified:
+          type: boolean
+        blacklisted:
+          type: boolean
+        metadata:
+          type: object
+        loginType:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time

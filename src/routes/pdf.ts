@@ -11,7 +11,7 @@ export default (route: Router) => {
     const pdfRouter: RouteOptions[] = [
         {
             method: 'post',
-            path: '/pdf/pdfReport',
+            path: '/pdf/diagnosis-report',
             action: generateReportPdf,
             description: 'Generate pdf report',
             roles: [],

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const folders = ['templates'];
+const folders = ['templates', 'openapi'];
 
 console.log('Copying assets...');
 

@@ -20,7 +20,7 @@ export const singletonEnvInitializer = Environment.initialize({
     },
 });
 
-export const APPLICATION_NAME = 'task-bend';
+export const APPLICATION_NAME = 'doctor-e-bend';
 
 export const CONFIG = Object.freeze({
     database: {
@@ -38,3 +38,11 @@ export const CONFIG = Object.freeze({
 export const VERSION1 = '/api/v1';
 
 export const DATABASE_URL = process.env.DATABASE_URL;
+
+export const JWT_KEYS: Readonly<Record<'access' | 'refresh', string>> = Object.freeze({
+    access: process.env.ACCESS_TOKEN_SECRET!,
+    refresh: process.env.REFRESH_TOKEN_SECRET!,
+});
+
+export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
+export const GOOGLE_SECRET_ID = process.env.GOOGLE_SECRET_ID!;

@@ -15,6 +15,7 @@ export interface BaseControllerAttributes {
     accepted: (res: Response, json: Record<string, any>) => void;
     noContent: (res: Response) => void;
     tryCall: (action: () => Promise<void>) => Promise<void>;
+    unauthorized: (res: Response, message: string) => void;
 }
 
 export class BaseController implements BaseControllerAttributes {
@@ -65,5 +66,9 @@ export class BaseController implements BaseControllerAttributes {
 
     public noContent(res: Response) {
         return res.status(STATUSCODES.NO_CONTENT).json();
+    }
+
+    public unauthorized(res: Response, message: string) {
+        return res.status(STATUSCODES.UNAUTHORIZED).json({ error_code: STATUSCODES.UNAUTHORIZED, error_message: message });
     }
 }

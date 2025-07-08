@@ -1,4 +1,6 @@
-import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
+import { UserRoles } from './userRoles';
 
 export type LOGIN_TYPE = 'google' | 'default';
 export interface UserAttributes {
@@ -57,4 +59,7 @@ export class Users extends BaseEntity implements UserAttributes {
 
     @DeleteDateColumn({ name: 'deletedAt', nullable: true, default: null })
     deletedAt?: Date | null;
+
+    @OneToMany(() => UserRoles, userRoles => userRoles.userId)
+    userRoles!: UserRoles[];
 }

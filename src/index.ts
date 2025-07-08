@@ -5,6 +5,7 @@ import { dbSource } from './dbConfig';
 import logger from './helpers/logger';
 import { globalErrorHandler } from './middlewares/error';
 import { log } from './middlewares/log';
+import specs from './openapi';
 import V1Routes from './routes/v1_routes';
 
 const initializeDatabase = Database.initialize(dbSource);
@@ -17,7 +18,7 @@ const serverOptions: ServerConfig = {
     defaultPort: Number(CONFIG.server.port) || 2000,
     middlewares: {
         cors: {
-            origin: '*',
+            origin: ['http://localhost:3000', 'https://doctor-e.vercel.app/', 'https://doctor-e.vercel.app', 'http://localhost:5000'],
             methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
             preflightContinue: false,
             optionsSuccessStatus: 204,
@@ -26,7 +27,7 @@ const serverOptions: ServerConfig = {
         },
         rateLimit: {
             windowMs: 15 * 60 * 1000, // 15 minutes
-            max: 100, // limit each IP to 100 requests per windowMs
+            max: 1000, // limit each IP to 100 requests per windowMs
         },
         helmet: true,
         bodyParser: {
@@ -42,6 +43,10 @@ const serverOptions: ServerConfig = {
         },
     ],
     errorHandler: globalErrorHandler,
+    openAPI: {
+        path: '/api-docs',
+        specs,
+    },
     terminusOptions: {
         onSignal: async () => {
             logger.info(`[Server]: cleanup started`);

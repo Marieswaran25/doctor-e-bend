@@ -8,7 +8,7 @@ export type PdfOptions = {
     printBackground?: boolean;
 };
 
-export type HTMLTemplates = 'pdfReport';
+export type HTMLTemplates = 'diagnosis-report';
 
 export class PdfService {
     public async htmlToPdf(html: string, pdfOptions: PdfOptions = { format: 'A4' }): Promise<Buffer> {

@@ -24,17 +24,17 @@ export class PdfController extends BaseController {
     public async generateReportPdf(req: Request, res: Response, next: NextFunction) {
         try {
             await validateRequest(req, [
-                body('diagnosis').isString().withMessage('Invalid diagnosis').optional(),
-                body('selectedTooth').isString().withMessage('Invalid selected tooth').optional(),
-                body('image').isString().withMessage('Invalid image').optional(),
-                body('reportType').isString().withMessage('Invalid report type').optional(),
-                body('name').isString().withMessage('Invalid name').optional(),
-                body('age').isNumeric().withMessage('Invalid age').optional(),
+                body('diagnosis').isString().withMessage('Invalid diagnosis'),
+                body('selectedTooth').isString().withMessage('Invalid selected tooth'),
+                body('image').isString().withMessage('Invalid image'),
+                body('reportType').isString().withMessage('Invalid report type'),
+                body('name').isString().withMessage('Invalid name'),
+                body('age').isNumeric().withMessage('Invalid age'),
             ]);
 
             const { diagnosis, selectedTooth = 'No Selection', image, reportType, name, age } = req.body;
             this.logger.info(`Generating pdf report`);
-            const pdfBuffer = await this.pdfService.generatePdfFromStoredHtml('pdfReport', {
+            const pdfBuffer = await this.pdfService.generatePdfFromStoredHtml('diagnosis-report', {
                 diagnosis: diagnosis,
                 selectedTooth,
                 image,
