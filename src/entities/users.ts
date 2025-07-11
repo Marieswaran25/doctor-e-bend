@@ -2,7 +2,7 @@ import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMa
 
 import { UserRoles } from './userRoles';
 
-export type LOGIN_TYPE = 'google' | 'default';
+export type LOGIN_TYPE = 'google' | 'default' | 'admin';
 export interface UserAttributes {
     id: string;
     username: string;
@@ -60,6 +60,6 @@ export class Users extends BaseEntity implements UserAttributes {
     @DeleteDateColumn({ name: 'deletedAt', nullable: true, default: null })
     deletedAt?: Date | null;
 
-    @OneToMany(() => UserRoles, userRoles => userRoles.userId)
+    @OneToMany(() => UserRoles, userRoles => userRoles.userId, { onDelete: 'CASCADE' })
     userRoles!: UserRoles[];
 }

@@ -14,6 +14,8 @@ export default (route: Router) => {
     const refresh = userController.rotateRefreshToken.bind(userController);
     const logout = userController.logout.bind(userController);
     const getMe = userController.getMe.bind(userController);
+    const getAllUsers = userController.getAllUsers.bind(userController);
+    const createAdminUser = userController.createAdminUser.bind(userController);
 
     const userRouter: RouteOptions[] = [
         {
@@ -57,6 +59,20 @@ export default (route: Router) => {
             action: logout,
             description: 'rotate refresh token',
             roles: [],
+        },
+        {
+            method: 'get',
+            path: '/users',
+            action: getAllUsers,
+            description: 'Get all users',
+            roles: ['root', 'super-admin', 'admin'],
+        },
+        {
+            method: 'post',
+            path: '/users/admin',
+            action: createAdminUser,
+            description: 'create users',
+            roles: ['root', 'super-admin'],
         },
     ];
 

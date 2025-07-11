@@ -1,7 +1,7 @@
 import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { Users } from './users';
-export type Roles = 'user' | 'admin' | 'super-admin';
+export type Roles = 'user' | 'admin' | 'super-admin' | 'root';
 export interface UserRoleAttributes {
     id: string;
     userId: Users;
@@ -14,7 +14,7 @@ export interface UserRoleAttributes {
 @Entity({ name: 'user-roles' })
 export class UserRoles extends BaseEntity implements UserRoleAttributes {
     @PrimaryGeneratedColumn('uuid', { name: 'id' })
-    id!: string;
+    id: string;
 
     @ManyToOne(() => Users, user => user.id, { nullable: false, onDelete: 'CASCADE' })
     userId!: Users;

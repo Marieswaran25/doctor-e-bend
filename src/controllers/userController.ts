@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 
+import { Roles, UserRoles } from '../entities/userRoles';
+import { LOGIN_TYPE, Users } from '../entities/users';
 import { hashPassword } from '../helpers/bcrypt';
 import { CustomError } from '../helpers/customErrors';
 import { getclientIp } from '../helpers/getClientIp';
@@ -76,6 +78,7 @@ export class UserController extends BaseController implements UserControllerAttr
                     accessToken,
                     refreshToken,
                     userId: user.id,
+                    roles: user.userRoles?.map(role => role.role) || [],
                 });
             }
         } catch (err) {
@@ -90,7 +93,7 @@ export class UserController extends BaseController implements UserControllerAttr
             const { email, password } = req.body;
 
             this.logger.info(`Finding user ${email}`);
-            const user = await this.userService.getUserByEmail(email);
+            const user = await this.userService.getUserByEmail(email, true);
             if (!user || !user?.password) {
                 return this.notFound(res, `User ${email} not found`);
             }
@@ -119,6 +122,7 @@ export class UserController extends BaseController implements UserControllerAttr
                 accessToken,
                 refreshToken,
                 userId: user.id,
+                roles: user.userRoles?.map(role => role.role) || [],
             });
         } catch (err) {
             next(err);
@@ -138,7 +142,8 @@ export class UserController extends BaseController implements UserControllerAttr
             const { email, name, profilePic, emailVerified } = await this.authService.verifyGoogleToken({ token, code });
 
             this.logger.info(`Finding user ${email}`);
-            const user = await this.userService.getUserByEmail(email);
+
+            const user = await this.userService.getUserByEmail(email, true);
             if (user) {
                 this.logger.info(`User ${email} found`);
                 const [accessToken, refreshToken] = await this.userService.generateToken(user.id, email);
@@ -154,6 +159,7 @@ export class UserController extends BaseController implements UserControllerAttr
                     accessToken,
                     refreshToken,
                     userId: user.id,
+                    roles: user.userRoles?.map(role => role.role) || [],
                 });
             } else {
                 this.logger.info(`Creating user ${email}`);
@@ -182,6 +188,7 @@ export class UserController extends BaseController implements UserControllerAttr
                     accessToken,
                     refreshToken,
                     userId: user.id,
+                    roles: user.userRoles?.map(role => role.role) || [],
                 });
             }
         } catch (err) {
@@ -234,6 +241,87 @@ export class UserController extends BaseController implements UserControllerAttr
             this.noContent(res);
         } catch (error) {
             next(error);
+        }
+    }
+    public async getAllUsers(req: Request, res: Response, next: NextFunction) {
+        await validateRequest(req, [
+            query('sortBy').isIn(['asc', 'desc']).withMessage('Either asc or desc').optional(),
+            query('loginType').isIn(['google', 'default', 'email']).withMessage('Either google or email').optional(),
+        ]);
+        const { sortBy = 'asc', loginType = 'all' } = req.query;
+        try {
+            const users: Array<Users & { userRoles: UserRoles[] }> = await Users.find({
+                where: { blacklisted: false, ...(loginType === 'all' ? {} : { loginType: loginType as LOGIN_TYPE }) },
+                order: { createdAt: sortBy as 'asc' | 'desc' },
+                relations: ['userRoles'],
+            });
+
+            const formattedUsers = users.map(user => {
+                const { password: _, ...rest } = user;
+                return {
+                    ...rest,
+                    userRoles: user.userRoles.map(role => role.role),
+                    metadata: rest.metadata ? JSON.parse(rest.metadata) : {},
+                };
+            });
+            return this.ok(res, { users: [...formattedUsers] });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    public async createAdminUser(req: CustomRequest, res: Response, next: NextFunction) {
+        try {
+            await validateRequest(req, [
+                body('email').isEmail().withMessage('Invalid email'),
+                body('roles').isArray({ min: 1 }).withMessage('Roles must be an array of at least 1 role').isIn(['admin', 'super-admin']).withMessage('Invalid roles'),
+            ]);
+            const { email, roles } = req.body;
+
+            const isUser = await this.userService.getUserByEmail(email, true);
+
+            if (isUser) {
+                this.logger.info(`User ${email} already exists`);
+                this.logger.info(`Creating roles for user ${email}`);
+
+                const oldRoles = isUser.userRoles?.map(role => role.role);
+                const uniqueRoles: Roles[] = roles.filter((role: Roles) => !oldRoles.includes(role));
+
+                this.logger.info(`Roles given: ${roles.join(', ')} ,New roles to be created: ${uniqueRoles.join(', ')}`);
+                if (uniqueRoles.length === 0) {
+                    this.logger.info(`No new roles to be created for user ${email}`);
+                    return this.ok(res, {
+                        user: {
+                            ...isUser,
+                            userRoles: [...(isUser?.userRoles || [])],
+                        },
+                    });
+                } else {
+                    const createdRoles = await this.userService.createRoles(uniqueRoles, isUser.id);
+                    this.ok(res, {
+                        user: {
+                            ...isUser,
+                            userRoles: [...(isUser?.userRoles || []), ...createdRoles],
+                        },
+                    });
+                }
+            } else {
+                const user = await this.userService.addUser({
+                    email,
+                    username: email,
+                    roles,
+                    metadata: { createdBy: req.user?.email || '' },
+                    loginType: 'admin',
+                    isEmailVerified: true,
+                    profilePic: '',
+                    mobileNumber: '',
+                    password: '',
+                });
+
+                return this.created(res, { user });
+            }
+        } catch (err) {
+            next(err);
         }
     }
 }

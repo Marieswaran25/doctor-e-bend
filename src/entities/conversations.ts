@@ -1,15 +1,13 @@
-import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
+import { Sessions } from './sessions';
 import { Users } from './users';
 
 export interface ConversationAttributes {
     id: string;
     externalConversationId: string;
-    startedAt: Date;
-    endedAt?: Date | null;
-    duration: number;
-    metadata: string | null;
-    status: 'active' | 'inactive';
+    conversation: string | null;
+    sessionId: Sessions;
     userId: Users;
     createdAt: Date;
     updatedAt?: Date | null;
@@ -24,20 +22,11 @@ export class Conversations extends BaseEntity implements ConversationAttributes 
     @Column('varchar', { name: 'externalConversationId', nullable: false, unique: true, length: 255 })
     externalConversationId!: string;
 
-    @Column('datetime', { name: 'startedAt', nullable: false })
-    startedAt!: Date;
+    @Column('jsonb', { name: 'conversation', nullable: true, default: null })
+    conversation: string | null;
 
-    @Column('datetime', { name: 'endedAt', nullable: true, default: null })
-    endedAt?: Date | null;
-
-    @Column('int', { name: 'duration', nullable: false, default: 0 })
-    duration!: number;
-
-    @Column('varchar', { name: 'status', nullable: false, length: 255 })
-    status: 'active' | 'inactive';
-
-    @Column('jsonb', { name: 'metadata', nullable: true, default: null })
-    metadata: string | null;
+    @OneToOne(() => Sessions, session => session.id, { nullable: false })
+    sessionId!: Sessions;
 
     @ManyToOne(() => Users, user => user.id, { nullable: false })
     userId!: Users;

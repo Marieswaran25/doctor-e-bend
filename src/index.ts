@@ -3,6 +3,7 @@ import { Server, ServerConfig } from './components/server';
 import { APPLICATION_NAME, CONFIG, singletonEnvInitializer, VERSION1 } from './config';
 import { dbSource } from './dbConfig';
 import logger from './helpers/logger';
+import { initializeJobs } from './jobs';
 import { globalErrorHandler } from './middlewares/error';
 import { log } from './middlewares/log';
 import specs from './openapi';
@@ -76,6 +77,7 @@ const initializeApp = async () => {
             const initializeServer = Server.initialize(serverOptions);
             const startServer = initializeServer.start.bind(initializeServer);
             startServer();
+            initializeJobs();
         }
     } catch (error: any) {
         console.error(error);

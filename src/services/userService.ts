@@ -29,7 +29,7 @@ export class UserService {
         username: string;
         mobileNumber: string;
         metadata: Record<string, any>;
-        loginType: 'default' | 'google';
+        loginType: 'default' | 'google' | 'admin';
         roles: Roles[];
         profilePic?: string;
         isEmailVerified?: boolean;
@@ -61,8 +61,19 @@ export class UserService {
         return user;
     }
 
-    async getUserByEmail(email: string): Promise<Users | null> {
-        const user = await Users.findOne({ where: { email, blacklisted: false } });
+    async createRoles(roles: Roles[], userId: string): Promise<UserRoles[]> {
+        const roleSaved = roles.map(role =>
+            UserRoles.create({
+                role,
+                userId: { id: userId },
+            }).save(),
+        );
+
+        return Promise.all(roleSaved);
+    }
+
+    async getUserByEmail<T extends boolean>(email: string, includeRoles?: T): Promise<T extends true ? (Users & { userRoles: UserRoles[] }) | null : Users | null> {
+        const user = await Users.findOne({ where: { email, blacklisted: false }, relations: includeRoles ? ['userRoles'] : [] });
         return user;
     }
 

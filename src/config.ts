@@ -20,7 +20,7 @@ export const singletonEnvInitializer = Environment.initialize({
     },
 });
 
-export const APPLICATION_NAME = 'doctor-e-bend';
+export const APPLICATION_NAME = 'Doctor E';
 
 export const CONFIG = Object.freeze({
     database: {
@@ -46,3 +46,8 @@ export const JWT_KEYS: Readonly<Record<'access' | 'refresh', string>> = Object.f
 
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 export const GOOGLE_SECRET_ID = process.env.GOOGLE_SECRET_ID!;
+
+export const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY!;
+export const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY!;
+
+export const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK!;

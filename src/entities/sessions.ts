@@ -24,10 +24,10 @@ export class Sessions extends BaseEntity implements SessionAttributes {
     @Column('varchar', { name: 'externalSessionId', nullable: false, unique: true, length: 255 })
     externalSessionId!: string;
 
-    @Column('datetime', { name: 'startedAt', nullable: false })
+    @Column('timestamp with time zone', { name: 'startedAt', nullable: false })
     startedAt!: Date;
 
-    @Column('datetime', { name: 'endedAt', nullable: true, default: null })
+    @Column('timestamp with time zone', { name: 'endedAt', nullable: true, default: null })
     endedAt?: Date | null;
 
     @Column('int', { name: 'duration', nullable: false, default: 0 })
