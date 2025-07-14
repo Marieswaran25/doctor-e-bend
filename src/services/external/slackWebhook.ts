@@ -8,10 +8,10 @@ export class SlackWebhook {
         this.webHook = new IncomingWebhook(webhook);
         this.allowedEnvironments = allowedEnvironments;
     }
-    send({ appEnv, msg, fallBackMsg, title, color = '#D00000' }: { appEnv: string; msg: string; title: string; fallBackMsg?: string; color?: string }) {
+    async send({ appEnv, msg, fallBackMsg, title, color = '#D00000' }: { appEnv: string; msg: string; title: string; fallBackMsg?: string; color?: string }) {
         if (this.allowedEnvironments.includes(appEnv)) {
             try {
-                this.webHook.send({
+                await this.webHook.send({
                     attachments: [
                         {
                             fallback: fallBackMsg,
@@ -26,8 +26,9 @@ export class SlackWebhook {
                         },
                     ],
                 });
-            } catch (error) {
+            } catch (error: any) {
                 console.error(`Error while calling slack hook`);
+                console.log(error?.message);
             }
         }
     }
