@@ -10,6 +10,7 @@ import { OperationalService } from '../services/operationalService';
 export const healthCheckMonitoringJob = async () => {
     try {
         logger.info('[JOB] Running Health Check Job...');
+        logger.info(`Timezone: ${process.env.TZ || ''}`)
         const initializeDatabase = Database.initialize(dbSource);
         const externalServices = new OperationalService();
         const isDbAvailable = initializeDatabase.isDbAvailable.bind(initializeDatabase);

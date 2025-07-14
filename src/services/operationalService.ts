@@ -40,7 +40,7 @@ export class OperationalService {
 
         const heygen = {
             status: isHeyenAvailable ? 'operational' : 'unavailable',
-            ...(expose_credits && { total: 670, used: (670 - availableCredits).toFixed(2), remaining: availableCredits }),
+            ...(expose_credits && { total: 670, used: Number((670 - availableCredits).toFixed(2)), remaining: availableCredits }),
             affectedComponents: heygenAffectedComponents,
         };
         const elevenlabs = {
@@ -49,7 +49,7 @@ export class OperationalService {
             affectedComponents: elevenLabsAffectedComponents,
         };
 
-        const overAllStatus = isHeyenAvailable && isElevenLabsAvailable ? 'operational' : 'unavailable';
+        const overAllStatus = isHeyenAvailable && isElevenLabsAvailable && elevenLabsCredits.remaining > 0 && availableCredits > 0 ? 'operational' : 'unavailable';
 
         const response = {
             status: overAllStatus,
